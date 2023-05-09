@@ -29,7 +29,7 @@ contract TokenTest is Test {
         );
 
         // Get digest.
-        bytes32 digest = factory.getDigest(name, symbol, salt, author);
+        bytes32 digest = factory.getDigest(name, symbol, salt, tokenAddress);
 
         // Sign salt (privateKey, digest) => (v, r, s).
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(authorPrivateKey, digest);

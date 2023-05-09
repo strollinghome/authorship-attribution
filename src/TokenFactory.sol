@@ -10,7 +10,7 @@ contract TokenFactory is EIP712 {
 
     bytes32 public constant TYPEHASH =
         keccak256(
-            "Create(string name,string symbol,bytes32 salt,address author)"
+            "AuthorshipAttribution(string name,string symbol,bytes32 salt,address author)"
         );
 
     constructor() EIP712("TokenFactory", "1") {
@@ -24,8 +24,15 @@ contract TokenFactory is EIP712 {
         address author,
         bytes memory signature
     ) public returns (address) {
+        address tokenAddress = predictDeterministicAddress(
+            name,
+            symbol,
+            salt,
+            author
+        );
+
         require(
-            isValid(name, symbol, salt, author, signature),
+            isValid(name, symbol, salt, tokenAddress, author, signature),
             "invalid signature"
         );
 
@@ -57,10 +64,11 @@ contract TokenFactory is EIP712 {
         string memory name,
         string memory symbol,
         bytes32 salt,
+        address token,
         address author,
         bytes memory signature
     ) public view returns (bool) {
-        bytes32 digest = getDigest(name, symbol, salt, author);
+        bytes32 digest = getDigest(name, symbol, salt, token);
 
         return
             author != address(0) && ECDSA.recover(digest, signature) == author;
@@ -70,11 +78,11 @@ contract TokenFactory is EIP712 {
         string memory name,
         string memory symbol,
         bytes32 salt,
-        address author
+        address token
     ) public view returns (bytes32) {
         return
             _hashTypedDataV4(
-                keccak256(abi.encode(TYPEHASH, name, symbol, salt, author))
+                keccak256(abi.encode(TYPEHASH, name, symbol, salt, token))
             );
     }
 }
