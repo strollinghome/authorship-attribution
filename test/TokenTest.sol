@@ -53,6 +53,10 @@ contract TokenTest is Test {
         assertEq(token.ownerOf(1), receiver);
 
         // Expect revert since the params have already been used.
+        vm.expectRevert("Initializable: contract is already initialized");
+        token.initialize(name, symbol, salt, author, signature);
+
+        // Expect revert since the params have already been used.
         vm.expectRevert("ERC1167: create2 failed");
         factory.createToken(name, symbol, salt, author, signature);
     }
