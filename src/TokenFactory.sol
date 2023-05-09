@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./Token.sol";
+import "./TokenClone.sol";
 import "openzeppelin-contracts/contracts/proxy/Clones.sol";
 import "openzeppelin-contracts/contracts/utils/cryptography/EIP712.sol";
 
@@ -14,7 +14,7 @@ contract TokenFactory is EIP712 {
         );
 
     constructor() EIP712("TokenFactory", "1") {
-        tokenImplementation = address(new Token());
+        tokenImplementation = address(new TokenClone());
     }
 
     function createToken(
@@ -41,7 +41,7 @@ contract TokenFactory is EIP712 {
             keccak256(abi.encode(name, symbol, salt, author))
         );
 
-        Token(token).initialize(name, symbol, salt, author, signature);
+        TokenClone(token).initialize(name, symbol, salt, author, signature);
 
         return token;
     }

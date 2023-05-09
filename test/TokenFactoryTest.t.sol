@@ -5,7 +5,7 @@ import "forge-std/Test.sol";
 
 import "../src/TokenFactory.sol";
 
-contract TokenTest is Test {
+contract TokenFactoryTest is Test {
     TokenFactory public factory;
 
     uint256 authorPrivateKey = 12345;
@@ -36,7 +36,7 @@ contract TokenTest is Test {
         bytes memory signature = abi.encodePacked(r, s, v);
 
         // Deploy token.
-        Token token = Token(
+        TokenClone token = TokenClone(
             factory.createToken(name, symbol, salt, author, signature)
         );
 

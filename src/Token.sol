@@ -2,22 +2,27 @@
 pragma solidity ^0.8.0;
 
 import "./IAuthorshipAttribution.sol";
-import "openzeppelin-contracts-upgradeable/contracts/token/ERC721/ERC721Upgradeable.sol";
-import "openzeppelin-contracts-upgradeable/contracts/access/AccessControlUpgradeable.sol";
+import "openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
+import "openzeppelin-contracts/contracts/access/AccessControl.sol";
+import "openzeppelin-contracts/contracts/utils/cryptography/EIP712.sol";
 
-contract Token is
-    IAuthorshipAttribution,
-    ERC721Upgradeable,
-    AccessControlUpgradeable
-{
-    function initialize(
+contract Token is IAuthorshipAttribution, EIP712, ERC721, AccessControl {
+    bytes32 public constant TYPEHASH =
+        keccak256(
+            "AuthorshipAttribution(string name,string symbol,bytes32 salt,address author)"
+        );
+
+    constructor(
         string memory name_,
         string memory symbol_,
         bytes32 salt,
         address author,
         bytes memory signature
-    ) public reinitializer(1) {
-        __ERC721_init_unchained(name_, symbol_);
+    ) EIP712("Token", "1") ERC721(name_, symbol_) {
+        require(
+            isValid(name_, symbol_, salt, address(this), author, signature),
+            "invalid signature"
+        );
 
         _grantRole(DEFAULT_ADMIN_ROLE, author);
 
@@ -40,14 +45,35 @@ contract Token is
 
     function supportsInterface(
         bytes4 interfaceId
-    )
-        public
-        view
-        override(ERC721Upgradeable, AccessControlUpgradeable)
-        returns (bool)
-    {
+    ) public view override(ERC721, AccessControl) returns (bool) {
         return
-            ERC721Upgradeable.supportsInterface(interfaceId) ||
-            AccessControlUpgradeable.supportsInterface(interfaceId);
+            ERC721.supportsInterface(interfaceId) ||
+            AccessControl.supportsInterface(interfaceId);
+    }
+
+    function isValid(
+        string memory name,
+        string memory symbol,
+        bytes32 salt,
+        address token,
+        address author,
+        bytes memory signature
+    ) public view returns (bool) {
+        bytes32 digest = getDigest(name, symbol, salt, token);
+
+        return
+            author != address(0) && ECDSA.recover(digest, signature) == author;
+    }
+
+    function getDigest(
+        string memory name,
+        string memory symbol,
+        bytes32 salt,
+        address token
+    ) public view returns (bytes32) {
+        return
+            _hashTypedDataV4(
+                keccak256(abi.encode(TYPEHASH, name, symbol, salt, token))
+            );
     }
 }
