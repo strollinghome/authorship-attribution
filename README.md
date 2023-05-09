@@ -13,7 +13,7 @@ Reference implementation for NFT Authorship Attribution. From the draft-EIP:
 This repo implements Authorship Attribution with two different deployment types for NFTs:
 
 - Using a factory contract that deploys clones (using EIP-1167)
-- Using and EOA to deploy the contract directly
+- Using an EOA to deploy the contract directly
 
 The first type is implemented with `TokenFactory.sol` and `TokenClone.sol`, and the second type is `Token.sol`.
 
