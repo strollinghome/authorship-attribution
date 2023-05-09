@@ -5,7 +5,7 @@ interface IAuthorshipAttribution {
     event AuthorshipAttribution(
         string name,
         string symbol,
-        bytes salt,
+        bytes32 salt,
         address token,
         address verifyingContract,
         string domainName,
