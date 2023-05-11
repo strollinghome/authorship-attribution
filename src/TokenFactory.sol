@@ -68,6 +68,7 @@ contract TokenFactory is EIP712 {
         address author,
         bytes memory signature
     ) public view returns (bool) {
+        // TODO: Add ERC-1271 support.
         bytes32 digest = getDigest(name, symbol, salt, token);
 
         return
