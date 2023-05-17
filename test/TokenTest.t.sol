@@ -4,8 +4,9 @@ pragma solidity ^0.8.13;
 import "forge-std/Test.sol";
 
 import "../src/Token.sol";
+import "../src/IAuthorshipAttribution.sol";
 
-contract TokenTest is Test {
+contract TokenTest is Test, IAuthorshipAttribution {
     uint256 authorPrivateKey = 12345;
     address author = vm.addr(authorPrivateKey);
 
@@ -41,6 +42,8 @@ contract TokenTest is Test {
 
         // Deploy token.
         vm.prank(deployer);
+        vm.expectEmit(true, true, true, true, tokenAddress);
+        emit AuthorshipAttribution(name, symbol, salt, "Token", "1", signature);
         Token token = new Token(name, symbol, salt, author, signature);
 
         // Check token metadata.

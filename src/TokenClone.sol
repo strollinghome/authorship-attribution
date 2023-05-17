@@ -17,10 +17,7 @@ contract TokenClone is
             "AuthorshipAttribution(string name,string symbol,bytes32 salt,address token)"
         );
 
-    string private DOMAIN_NAME = "Token";
-    string private VERSION = "1";
-
-    constructor() EIP712(DOMAIN_NAME, VERSION) {}
+    constructor() EIP712("Token", "1") {}
 
     function initialize(
         string memory name_,
@@ -42,8 +39,8 @@ contract TokenClone is
             name_,
             symbol_,
             salt,
-            DOMAIN_NAME,
-            VERSION,
+            "Token",
+            "1",
             signature
         );
     }

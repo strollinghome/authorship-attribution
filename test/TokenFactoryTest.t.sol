@@ -4,8 +4,9 @@ pragma solidity ^0.8.13;
 import "forge-std/Test.sol";
 
 import "../src/TokenFactory.sol";
+import "../src/IAuthorshipAttribution.sol";
 
-contract TokenFactoryTest is Test {
+contract TokenFactoryTest is Test, IAuthorshipAttribution {
     TokenFactory public factory;
 
     uint256 authorPrivateKey = 12345;
@@ -36,6 +37,8 @@ contract TokenFactoryTest is Test {
         bytes memory signature = abi.encodePacked(r, s, v);
 
         // Deploy token.
+        vm.expectEmit(true, true, true, true, tokenAddress);
+        emit AuthorshipAttribution(name, symbol, salt, "Token", "1", signature);
         TokenClone token = TokenClone(
             factory.createToken(
                 name,
