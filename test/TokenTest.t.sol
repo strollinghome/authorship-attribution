@@ -69,7 +69,7 @@ contract TokenTest is Test {
         bytes32 versionHash = keccak256(bytes("1"));
 
         bytes32 TYPEHASH = keccak256(
-            "AuthorshipAttribution(string name,string symbol,bytes32 salt,address author)"
+            "AuthorshipAttribution(string name,string symbol,bytes32 salt,address token)"
         );
 
         return

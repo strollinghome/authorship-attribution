@@ -6,11 +6,8 @@ interface IAuthorshipAttribution {
         string name,
         string symbol,
         bytes32 salt,
-        address token,
-        address verifyingContract,
         string domainName,
         string version,
-        address author,
         bytes signature
     );
 }

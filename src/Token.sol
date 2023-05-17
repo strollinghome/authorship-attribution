@@ -9,8 +9,11 @@ import "openzeppelin-contracts/contracts/utils/cryptography/EIP712.sol";
 contract Token is IAuthorshipAttribution, EIP712, ERC721, AccessControl {
     bytes32 public constant TYPEHASH =
         keccak256(
-            "AuthorshipAttribution(string name,string symbol,bytes32 salt,address author)"
+            "AuthorshipAttribution(string name,string symbol,bytes32 salt,address token)"
         );
+
+    string private DOMAIN_NAME = "Token";
+    string private VERSION = "1";
 
     constructor(
         string memory name_,
@@ -18,7 +21,7 @@ contract Token is IAuthorshipAttribution, EIP712, ERC721, AccessControl {
         bytes32 salt,
         address author,
         bytes memory signature
-    ) EIP712("Token", "1") ERC721(name_, symbol_) {
+    ) EIP712(DOMAIN_NAME, VERSION) ERC721(name_, symbol_) {
         require(
             isValid(name_, symbol_, salt, address(this), author, signature),
             "invalid signature"
@@ -30,11 +33,8 @@ contract Token is IAuthorshipAttribution, EIP712, ERC721, AccessControl {
             name_,
             symbol_,
             salt,
-            address(this),
-            msg.sender,
-            "TokenFactory",
-            "1",
-            author,
+            DOMAIN_NAME,
+            VERSION,
             signature
         );
     }

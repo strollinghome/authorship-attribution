@@ -3,17 +3,13 @@ pragma solidity ^0.8.0;
 
 import "./TokenClone.sol";
 import "openzeppelin-contracts/contracts/proxy/Clones.sol";
-import "openzeppelin-contracts/contracts/utils/cryptography/EIP712.sol";
 
-contract TokenFactory is EIP712 {
+contract TokenFactory {
+    error Already_Deployed();
+
     address public immutable tokenImplementation;
 
-    bytes32 public constant TYPEHASH =
-        keccak256(
-            "AuthorshipAttribution(string name,string symbol,bytes32 salt,address author)"
-        );
-
-    constructor() EIP712("TokenFactory", "1") {
+    constructor() {
         tokenImplementation = address(new TokenClone());
     }
 
@@ -22,19 +18,10 @@ contract TokenFactory is EIP712 {
         string memory symbol,
         bytes32 salt,
         address author,
+        address tokenAddress,
         bytes memory signature
     ) public returns (address) {
-        address tokenAddress = predictDeterministicAddress(
-            name,
-            symbol,
-            salt,
-            author
-        );
-
-        require(
-            isValid(name, symbol, salt, tokenAddress, author, signature),
-            "invalid signature"
-        );
+        if (tokenAddress.code.length > 0) revert Already_Deployed();
 
         address token = Clones.cloneDeterministic(
             tokenImplementation,
@@ -57,33 +44,6 @@ contract TokenFactory is EIP712 {
                 tokenImplementation,
                 keccak256(abi.encode(name, symbol, salt, author)),
                 address(this)
-            );
-    }
-
-    function isValid(
-        string memory name,
-        string memory symbol,
-        bytes32 salt,
-        address token,
-        address author,
-        bytes memory signature
-    ) public view returns (bool) {
-        // TODO: Add ERC-1271 support.
-        bytes32 digest = getDigest(name, symbol, salt, token);
-
-        return
-            author != address(0) && ECDSA.recover(digest, signature) == author;
-    }
-
-    function getDigest(
-        string memory name,
-        string memory symbol,
-        bytes32 salt,
-        address token
-    ) public view returns (bytes32) {
-        return
-            _hashTypedDataV4(
-                keccak256(abi.encode(TYPEHASH, name, symbol, salt, token))
             );
     }
 }
